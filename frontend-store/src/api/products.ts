@@ -22,7 +22,7 @@ export interface ProductDetail extends ProductListItem {
 
 export const productsApi = {
   getList: (params?: { categoryId?: number; keyword?: string; sort?: string; page?: number; size?: number }) =>
-    client.get<{ data: { content: ProductListItem[]; totalElements: number } }>('/api/v1/products', { params }),
+    client.get<{ data: { content: ProductListItem[]; totalElements: number; totalPages: number } }>('/api/v1/products', { params }),
 
   getDetail: (id: number) =>
     client.get<{ data: ProductDetail }>(`/api/v1/products/${id}`),

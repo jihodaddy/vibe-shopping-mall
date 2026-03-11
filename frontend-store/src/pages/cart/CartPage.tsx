@@ -24,10 +24,10 @@ export default function CartPage() {
     : JSON.parse(localStorage.getItem('guestCart') || '[]')
 
   const cartItems = isAuthenticated
-    ? (data?.data.data?.items ?? [])
+    ? (data?.data.data ?? [])
     : guestItems
 
-  const total = cartItems.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)
+  const total = cartItems.reduce((sum: number, item: any) => sum + item.price * (item.qty ?? item.quantity), 0)
 
   const handleRemove = (cartItemId: number) => {
     if (isAuthenticated) {
@@ -69,7 +69,7 @@ export default function CartPage() {
           <>
             <div className="flex flex-col gap-4 mb-8">
               {cartItems.map((item: any) => (
-                <div key={item.cartItemId ?? item.productId}
+                <div key={item.id ?? item.productId}
                      className="flex items-center gap-4 p-4"
                      style={{ backgroundColor: 'var(--paper)', border: '1px solid var(--linen)' }}>
                   <div className="w-16 h-16 flex-shrink-0"
@@ -84,14 +84,14 @@ export default function CartPage() {
                       {item.productName ?? item.name}
                     </p>
                     <p className="text-xs mt-1" style={{ color: 'var(--warm-mid)' }}>
-                      {item.price?.toLocaleString()}원 × {item.quantity}
+                      {item.price?.toLocaleString()}원 × {item.qty ?? item.quantity}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium" style={{ color: 'var(--mocha)' }}>
-                      {(item.price * item.quantity)?.toLocaleString()}원
+                      {(item.price * (item.qty ?? item.quantity))?.toLocaleString()}원
                     </p>
-                    <button onClick={() => handleRemove(item.cartItemId ?? item.productId)}
+                    <button onClick={() => handleRemove(item.id ?? item.productId)}
                             className="text-xs mt-1"
                             style={{ color: 'var(--warm-mid)' }}>
                       삭제

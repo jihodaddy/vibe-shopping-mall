@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { productApi } from '../../api/products'
+import { productsApi } from '../../api/products'
 import { cartApi } from '../../api/cart'
 import { useAuthStore } from '../../store/authStore'
 
@@ -15,7 +15,7 @@ export default function ProductDetailPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['product', id],
-    queryFn: () => productApi.getDetail(Number(id)),
+    queryFn: () => productsApi.getDetail(Number(id)),
     enabled: !!id,
   })
 
@@ -26,7 +26,7 @@ export default function ProductDetailPage() {
     setAdding(true)
     try {
       if (isAuthenticated) {
-        await cartApi.addItem({ productId: product.id, quantity })
+        await cartApi.addItem({ productId: product.id, qty: quantity })
       } else {
         const guest = JSON.parse(localStorage.getItem('guestCart') || '[]')
         const existing = guest.find((i: any) => i.productId === product.id)
@@ -105,7 +105,7 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {product.stockQuantity === 0 ? (
+            {product.stockQty === 0 ? (
               <button disabled className="w-full py-3 text-sm"
                       style={{ backgroundColor: 'var(--linen)', color: 'var(--warm-mid)' }}>
                 품절
@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
             </button>
 
             <p className="text-xs mt-6" style={{ color: 'var(--warm-mid)' }}>
-              재고: {product.stockQuantity}개
+              재고: {product.stockQty}개
             </p>
           </div>
         </div>

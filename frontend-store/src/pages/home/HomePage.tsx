@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { productApi } from '../../api/products'
+import { productsApi } from '../../api/products'
 
 export default function HomePage() {
   const [page, setPage] = useState(0)
@@ -10,7 +10,7 @@ export default function HomePage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['products', page, search],
-    queryFn: () => productApi.getList({ page, size: 12, keyword: search || undefined }),
+    queryFn: () => productsApi.getList({ page, size: 12, keyword: search || undefined }),
   })
 
   const products = data?.data.data?.content ?? []

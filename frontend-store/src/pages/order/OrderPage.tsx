@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { cartApi } from '../../api/cart'
-import { orderApi } from '../../api/orders'
+import { ordersApi } from '../../api/orders'
 
 export default function OrderPage() {
   const navigate = useNavigate()
@@ -20,8 +20,8 @@ export default function OrderPage() {
     queryFn: () => cartApi.getCart(),
   })
 
-  const cartItems = data?.data.data?.items ?? []
-  const total = cartItems.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)
+  const cartItems = data?.data.data ?? []
+  const total = cartItems.reduce((sum: number, item: any) => sum + item.price * item.qty, 0)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,18 +32,17 @@ export default function OrderPage() {
     setSubmitting(true)
     setError('')
     try {
-      const res = await orderApi.createOrder({
-        cartItemIds: cartItems.map((i: any) => i.cartItemId),
+      const res = await ordersApi.createOrder({
         receiverName,
         receiverPhone,
-        zipCode,
+        zipcode: zipCode,
         address,
         addressDetail,
-        memo,
+        deliveryMemo: memo,
+        paymentMethod: 'TOSS',
       })
-      const { orderId, orderNumber, totalAmount } = res.data.data
-      // Redirect to Toss payment (in a real app, load Toss SDK)
-      navigate(`/order/complete?orderId=${orderId}&orderNumber=${orderNumber}&amount=${totalAmount}`)
+      const { orderNumber, finalPrice } = res.data.data
+      navigate(`/order/complete?orderNumber=${orderNumber}&amount=${finalPrice}`)
     } catch {
       setError('주문 처리 중 오류가 발생했습니다.')
     } finally {
@@ -63,13 +62,13 @@ export default function OrderPage() {
           <section style={{ backgroundColor: 'var(--paper)', border: '1px solid var(--linen)', padding: 20 }}>
             <h2 className="text-sm font-medium mb-4" style={{ color: 'var(--ink)' }}>주문 상품</h2>
             {cartItems.map((item: any) => (
-              <div key={item.cartItemId} className="flex justify-between py-2"
+              <div key={item.id} className="flex justify-between py-2"
                    style={{ borderBottom: '1px solid var(--linen)' }}>
                 <span className="text-sm" style={{ color: 'var(--ink)' }}>
-                  {item.productName} × {item.quantity}
+                  {item.productName} × {item.qty}
                 </span>
                 <span className="text-sm" style={{ color: 'var(--mocha)' }}>
-                  {(item.price * item.quantity).toLocaleString()}원
+                  {(item.price * item.qty).toLocaleString()}원
                 </span>
               </div>
             ))}
