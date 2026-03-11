@@ -31,3 +31,6 @@ dist/
 
 # Docker volumes
 mysql_data/
+
+# Git worktrees
+.worktrees/
