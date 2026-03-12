@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     // 회원
     MEMBER_NOT_FOUND("회원을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    // 어드민
+    ADMIN_NOT_FOUND("어드민 계정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     DUPLICATE_EMAIL("이미 사용 중인 이메일입니다.", HttpStatus.CONFLICT),
     INVALID_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
 
@@ -34,7 +37,10 @@ public enum ErrorCode {
     COUPON_ALREADY_USED("이미 사용된 쿠폰입니다.", HttpStatus.CONFLICT),
 
     // 장바구니
-    CART_ITEM_NOT_FOUND("장바구니 아이템을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    CART_ITEM_NOT_FOUND("장바구니 아이템을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    // 파일 업로드
+    S3_UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String message;
     private final HttpStatus httpStatus;
