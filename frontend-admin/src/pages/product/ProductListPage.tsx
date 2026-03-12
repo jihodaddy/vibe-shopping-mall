@@ -34,7 +34,7 @@ const STATUS_COLORS: Record<ProductStatus, string> = {
   ON_SALE: 'green',
   SOLD_OUT: 'orange',
   HIDDEN: 'red',
-  DELETED: 'default',
+  DELETED: 'gray',
 };
 
 export default function ProductListPage() {
