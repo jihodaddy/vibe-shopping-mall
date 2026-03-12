@@ -41,4 +41,14 @@ public class Category {
         this.name = name;
         this.depth = depth;
     }
+
+    public void update(String name, int sortOrder, boolean isActive) {
+        this.name = name;
+        this.sortOrder = sortOrder;
+        this.isActive = isActive;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
 }
