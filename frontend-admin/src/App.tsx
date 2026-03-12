@@ -3,7 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
-import { MembersPage, CouponsPage, CsPage, StatsPage } from './pages/placeholder/PlaceholderPage';
+import { CouponsPage, CsPage, StatsPage } from './pages/placeholder/PlaceholderPage';
+import MemberListPage from './pages/member/MemberListPage';
+import MemberDetailPage from './pages/member/MemberDetailPage';
 import OrderListPage from './pages/order/OrderListPage';
 import OrderDetailPage from './pages/order/OrderDetailPage';
 import ProductListPage from './pages/product/ProductListPage';
@@ -39,7 +41,8 @@ export default function App() {
             <Route path="/categories" element={<CategoryPage />} />
             <Route path="/orders" element={<OrderListPage />} />
             <Route path="/orders/:id" element={<OrderDetailPage />} />
-            <Route path="/members" element={<MembersPage />} />
+            <Route path="/members" element={<MemberListPage />} />
+            <Route path="/members/:id" element={<MemberDetailPage />} />
             <Route path="/coupons" element={<CouponsPage />} />
             <Route path="/cs" element={<CsPage />} />
             <Route path="/stats" element={<StatsPage />} />
