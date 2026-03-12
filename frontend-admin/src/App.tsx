@@ -3,7 +3,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
-import { ProductsPage, OrdersPage, MembersPage, CouponsPage, CsPage, StatsPage } from './pages/placeholder/PlaceholderPage';
+import { OrdersPage, MembersPage, CouponsPage, CsPage, StatsPage } from './pages/placeholder/PlaceholderPage';
+import ProductListPage from './pages/product/ProductListPage';
+import ProductFormPage from './pages/product/ProductFormPage';
+import CategoryPage from './pages/product/CategoryPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,7 +31,10 @@ export default function App() {
           {/* Protected routes with AdminLayout */}
           <Route element={<AdminLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products" element={<ProductListPage />} />
+            <Route path="/products/new" element={<ProductFormPage />} />
+            <Route path="/products/:id" element={<ProductFormPage />} />
+            <Route path="/categories" element={<CategoryPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/members" element={<MembersPage />} />
             <Route path="/coupons" element={<CouponsPage />} />
