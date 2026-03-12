@@ -40,7 +40,9 @@ public class SecurityConfig {
                 ).permitAll()
                 .requestMatchers("/api/admin/auth/**").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/admin/**").hasRole("SUPER_ADMIN")
-                .requestMatchers("/api/admin/members/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/members/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                // TODO: CS_AGENT 역할의 접근 권한은 향후 태스크에서 정의 예정입니다.
+                //       현재 CS_AGENT는 어드민 API에 대한 접근 권한이 없습니다.
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             )

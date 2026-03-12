@@ -25,7 +25,7 @@ public class AdminAuthService {
 
     public AdminLoginResponse login(AdminLoginRequest request) {
         AdminUser admin = adminUserRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(ErrorCode.ADMIN_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
             throw new BusinessException(ErrorCode.INVALID_PASSWORD);
@@ -48,6 +48,11 @@ public class AdminAuthService {
     }
 
     public void logout(String accessToken, Long adminId) {
+        Long tokenOwnerId = jwtProvider.getMemberId(accessToken);
+        if (!tokenOwnerId.equals(adminId)) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
         long expiration = jwtProvider.getExpiration(accessToken);
         if (expiration > 0) {
             redisTemplate.opsForValue().set(

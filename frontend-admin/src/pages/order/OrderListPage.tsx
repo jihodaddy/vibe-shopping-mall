@@ -51,14 +51,14 @@ const STATUS_LABELS: Record<string, string> = {
   EXCHANGED: '교환',
 };
 
-const TAB_STATUSES: Record<string, string | string[] | undefined> = {
+const TAB_STATUSES: Record<string, string | undefined> = {
   all: undefined,
   PAID: 'PAID',
   PREPARING: 'PREPARING',
   SHIPPED: 'SHIPPED',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED',
-  refund: ['REFUND_REQUESTED', 'REFUNDED'],
+  refund: 'REFUND_REQUESTED',
 };
 
 export default function OrderListPage() {
@@ -73,12 +73,7 @@ export default function OrderListPage() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [bulkStatus, setBulkStatus] = useState<string>('PREPARING');
 
-  const getStatusParam = () => {
-    const s = TAB_STATUSES[activeTab];
-    if (!s) return undefined;
-    if (Array.isArray(s)) return s.join(',');
-    return s;
-  };
+  const getStatusParam = () => TAB_STATUSES[activeTab] || undefined;
 
   const { data, isLoading } = useQuery({
     queryKey: ['adminOrders', page, pageSize, searchKeyword, dateRange, activeTab],

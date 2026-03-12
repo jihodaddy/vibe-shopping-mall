@@ -209,7 +209,7 @@ export default function OrderDetailPage() {
           </Descriptions.Item>
         </Descriptions>
         <Table
-          rowKey="productId"
+          rowKey="id"
           columns={itemColumns}
           dataSource={order.items}
           pagination={false}

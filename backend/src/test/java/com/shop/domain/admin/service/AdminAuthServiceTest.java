@@ -110,7 +110,7 @@ class AdminAuthServiceTest {
         // when & then
         assertThatThrownBy(() -> adminAuthService.login(request))
             .isInstanceOf(BusinessException.class)
-            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.MEMBER_NOT_FOUND);
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ADMIN_NOT_FOUND);
     }
 
     @Test
@@ -165,5 +165,53 @@ class AdminAuthServiceTest {
         // then
         assertThat(response.getRole()).isEqualTo("SUPER_ADMIN");
         verify(jwtProvider).createAccessToken(any(), eq("SUPER_ADMIN"));
+    }
+
+    @Test
+    void 로그아웃_성공() {
+        // given
+        Long adminId = 1L;
+        String accessToken = "valid-access-token";
+        given(jwtProvider.getMemberId(accessToken)).willReturn(adminId);
+        given(jwtProvider.getExpiration(accessToken)).willReturn(3600000L);
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+
+        // when
+        adminAuthService.logout(accessToken, adminId);
+
+        // then
+        verify(jwtProvider).getMemberId(accessToken);
+        verify(valueOperations).set(eq("blacklist:" + accessToken), eq("1"), any());
+        verify(redisTemplate).delete("admin:session:" + adminId);
+    }
+
+    @Test
+    void 로그아웃_토큰_소유자_불일치_실패() {
+        // given
+        Long adminId = 1L;
+        Long differentAdminId = 2L;
+        String accessToken = "other-admin-token";
+        given(jwtProvider.getMemberId(accessToken)).willReturn(differentAdminId);
+
+        // when & then
+        assertThatThrownBy(() -> adminAuthService.logout(accessToken, adminId))
+            .isInstanceOf(BusinessException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ACCESS_DENIED);
+    }
+
+    @Test
+    void 로그아웃_토큰_만료된_경우_블랙리스트_미등록() {
+        // given
+        Long adminId = 1L;
+        String accessToken = "expired-access-token";
+        given(jwtProvider.getMemberId(accessToken)).willReturn(adminId);
+        given(jwtProvider.getExpiration(accessToken)).willReturn(-1L);
+
+        // when
+        adminAuthService.logout(accessToken, adminId);
+
+        // then - 만료된 토큰은 블랙리스트에 등록하지 않고 세션만 삭제
+        verify(redisTemplate).delete("admin:session:" + adminId);
+        verify(redisTemplate, org.mockito.Mockito.never()).opsForValue();
     }
 }

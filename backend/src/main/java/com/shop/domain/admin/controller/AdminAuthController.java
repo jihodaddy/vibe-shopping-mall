@@ -6,6 +6,7 @@ import com.shop.domain.admin.service.AdminAuthService;
 import com.shop.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,13 @@ public class AdminAuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @AuthenticationPrincipal Long adminId) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Authorization 헤더는 'Bearer '로 시작해야 합니다.", "INVALID_TOKEN"));
+        }
 
         String token = authHeader.substring(7);
         adminAuthService.logout(token, adminId);
