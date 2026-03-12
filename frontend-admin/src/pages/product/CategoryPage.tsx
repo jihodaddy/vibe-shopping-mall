@@ -33,7 +33,7 @@ interface CategoryNode extends TreeDataNode {
   children: CategoryNode[];
 }
 
-function buildTreeData(categories: AdminCategoryResponse[], parentId?: number): CategoryNode[] {
+function buildTreeData(categories: AdminCategoryResponse[]): CategoryNode[] {
   return categories.map((cat) => ({
     key: cat.id,
     id: cat.id,
@@ -42,8 +42,7 @@ function buildTreeData(categories: AdminCategoryResponse[], parentId?: number): 
     sortOrder: cat.sortOrder,
     active: cat.active,
     title: cat.name,
-    children: cat.children ? buildTreeData(cat.children, cat.id) : [],
-    _parentId: parentId,
+    children: cat.children ? buildTreeData(cat.children) : [],
   }));
 }
 

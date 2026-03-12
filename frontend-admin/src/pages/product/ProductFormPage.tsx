@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -64,11 +64,12 @@ export default function ProductFormPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const isEdit = Boolean(id && id !== 'new');
-  const productId = isEdit ? Number(id) : null;
+  const productId = isEdit ? id : null;
   const queryClient = useQueryClient();
   const [form] = Form.useForm<FormValues>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadedUrls, setUploadedUrls] = useState<Record<string, boolean>>({});
+  const uidToUrlRef = useRef<Map<string, string>>(new Map());
 
   const { data: categoriesData } = useQuery({
     queryKey: ['adminCategories'],
@@ -76,9 +77,9 @@ export default function ProductFormPage() {
   });
 
   const { data: productData, isLoading: productLoading } = useQuery({
-    queryKey: ['adminProduct', productId],
-    queryFn: () => adminProductApi.getDetail(productId!).then((r) => r.data.data),
-    enabled: isEdit && productId !== null,
+    queryKey: ['adminProduct', 'detail', productId ?? 'new'],
+    queryFn: () => adminProductApi.getDetail(Number(productId)!).then((r) => r.data.data),
+    enabled: isEdit && productId !== null && !isNaN(Number(productId)),
   });
 
   useEffect(() => {
@@ -94,12 +95,16 @@ export default function ProductFormPage() {
       });
       setUploadedUrls(productData.imageUrls ?? {});
       const existingFiles: UploadFile[] = Object.keys(productData.imageUrls ?? {}).map(
-        (url, idx) => ({
-          uid: `-${idx}`,
-          name: `image-${idx}`,
-          status: 'done',
-          url,
-        })
+        (fileUrl, idx) => {
+          const uid = `existing-${fileUrl}`;
+          uidToUrlRef.current.set(uid, fileUrl);
+          return {
+            uid,
+            name: `image-${idx}`,
+            status: 'done',
+            url: fileUrl,
+          };
+        }
       );
       setFileList(existingFiles);
     }
@@ -123,7 +128,7 @@ export default function ProductFormPage() {
     onSuccess: () => {
       message.success('상품이 수정되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['adminProducts'] });
-      queryClient.invalidateQueries({ queryKey: ['adminProduct', productId] });
+      queryClient.invalidateQueries({ queryKey: ['adminProduct', 'detail', productId ?? 'new'] });
       navigate('/products');
     },
     onError: () => {
@@ -133,7 +138,7 @@ export default function ProductFormPage() {
 
   const handleUpload: UploadProps['customRequest'] = async (options) => {
     const { file, onSuccess, onError } = options;
-    const uploadFile = file as File;
+    const uploadFile = file as File & { uid: string };
     try {
       const { data: presignedData } = await adminProductApi.getPresignedUrl(
         uploadFile.name,
@@ -145,7 +150,13 @@ export default function ProductFormPage() {
         headers: { 'Content-Type': uploadFile.type },
       });
 
+      uidToUrlRef.current.set(uploadFile.uid, fileUrl);
       setUploadedUrls((prev) => ({ ...prev, [fileUrl]: true }));
+      setFileList((prev) =>
+        prev.map((f) =>
+          f.uid === uploadFile.uid ? { ...f, url: fileUrl, status: 'done' } : f
+        )
+      );
       onSuccess?.({});
     } catch (err) {
       message.error('이미지 업로드에 실패했습니다.');
@@ -154,23 +165,27 @@ export default function ProductFormPage() {
   };
 
   const handleFileChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-    // Remove urls that no longer have a corresponding file
-    const remainingUrls = newFileList
-      .filter((f) => f.url)
-      .reduce<Record<string, boolean>>((acc, f) => {
-        if (f.url) acc[f.url] = true;
-        return acc;
-      }, {});
-    setUploadedUrls((prev) => {
-      const next: Record<string, boolean> = {};
-      for (const url of Object.keys(prev)) {
-        if (newFileList.some((f) => f.url === url) || !Object.keys(remainingUrls).length) {
-          next[url] = prev[url];
+    // Find removed files
+    const removedUids = fileList
+      .filter((f) => !newFileList.find((nf) => nf.uid === f.uid))
+      .map((f) => f.uid);
+
+    // Clean up uploadedUrls for removed files
+    if (removedUids.length > 0) {
+      setUploadedUrls((prev) => {
+        const next = { ...prev };
+        for (const uid of removedUids) {
+          const url = uidToUrlRef.current.get(uid);
+          if (url) {
+            delete next[url];
+            uidToUrlRef.current.delete(uid);
+          }
         }
-      }
-      return next;
-    });
+        return next;
+      });
+    }
+
+    setFileList(newFileList);
   };
 
   const handleSubmit = (values: FormValues) => {
@@ -186,7 +201,7 @@ export default function ProductFormPage() {
 
     if (isEdit && productId) {
       updateMutation.mutate({
-        id: productId,
+        id: Number(productId),
         data: { ...payload, status: values.status ?? 'ON_SALE' },
       });
     } else {
@@ -278,6 +293,19 @@ export default function ProductFormPage() {
             listType="picture-card"
             accept="image/*"
             multiple
+            beforeUpload={(file) => {
+              const isImage = file.type.startsWith('image/');
+              if (!isImage) {
+                message.error('이미지 파일만 업로드할 수 있습니다.');
+                return Upload.LIST_IGNORE;
+              }
+              const isLt10M = file.size / 1024 / 1024 < 10;
+              if (!isLt10M) {
+                message.error('이미지 크기는 10MB 이하이어야 합니다.');
+                return Upload.LIST_IGNORE;
+              }
+              return true;
+            }}
           >
             <div>
               <UploadOutlined />
