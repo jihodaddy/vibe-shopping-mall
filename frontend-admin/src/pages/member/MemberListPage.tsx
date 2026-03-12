@@ -184,6 +184,7 @@ export default function MemberListPage() {
                 { label: '활성', value: 'ACTIVE' },
                 { label: '정지', value: 'INACTIVE' },
                 { label: '차단', value: 'BANNED' },
+                { label: '탈퇴', value: 'WITHDRAWN' },
               ]}
             />
           </Col>

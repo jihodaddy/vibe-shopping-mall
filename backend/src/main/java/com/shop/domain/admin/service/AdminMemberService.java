@@ -8,11 +8,13 @@ import com.shop.domain.member.repository.MemberRepository;
 import com.shop.global.exception.BusinessException;
 import com.shop.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -44,6 +46,9 @@ public class AdminMemberService {
     public void addPoint(Long memberId, AdminMemberPointRequest request) {
         Member member = findById(memberId);
         member.addPoint(request.getAmount());
+        // TODO: 포인트 이력 엔티티 구현 시 reason 저장 예정
+        log.info("어드민 포인트 지급: memberId={}, amount={}, reason={}",
+            memberId, request.getAmount(), request.getReason());
     }
 
     public void updateStatus(Long memberId, MemberStatus status) {

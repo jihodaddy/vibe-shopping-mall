@@ -155,7 +155,7 @@ export default function MemberDetailPage() {
               onClick={handleStatusToggle}
               disabled={member.status === 'BANNED' || member.status === 'WITHDRAWN'}
             >
-              {member.status === 'ACTIVE' ? '회원 정지' : '회원 활성화'}
+              {member.status === 'ACTIVE' ? '회원 정지' : member.status === 'BANNED' ? '차단 상태' : member.status === 'WITHDRAWN' ? '탈퇴 회원' : '회원 활성화'}
             </Button>
           </Space>
         }
