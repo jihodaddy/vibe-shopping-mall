@@ -23,6 +23,7 @@ public enum ErrorCode {
     // 상품
     PRODUCT_NOT_FOUND("상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     CATEGORY_NOT_FOUND("카테고리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    CATEGORY_DEPTH_EXCEEDED("카테고리 깊이는 최대 3단계까지 허용됩니다.", HttpStatus.BAD_REQUEST),
     OUT_OF_STOCK("재고가 부족합니다.", HttpStatus.CONFLICT),
 
     // 주문/결제

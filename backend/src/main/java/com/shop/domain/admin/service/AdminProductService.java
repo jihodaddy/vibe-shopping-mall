@@ -81,20 +81,16 @@ public class AdminProductService {
 
     @Transactional(readOnly = true)
     public Page<AdminProductResponse> getProductList(Pageable pageable, String keyword,
-                                                      Long categoryId, String status) {
-        ProductStatus productStatus = null;
-        if (status != null && !status.isBlank()) {
-            productStatus = ProductStatus.valueOf(status);
-        }
-
-        return productRepository.findByCondition(keyword, categoryId, productStatus, pageable)
+                                                      Long categoryId, ProductStatus status) {
+        return productRepository.findByCondition(keyword, categoryId, status, pageable)
             .map(AdminProductResponse::from);
     }
 
     @Transactional(readOnly = true)
     public AdminProductResponse getProductDetail(Long id) {
-        Product product = productRepository.findByIdWithImagesAndOptions(id)
+        Product product = productRepository.findByIdWithImages(id)
             .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.getOptions().size(); // trigger lazy load within transaction
 
         return AdminProductResponse.from(product);
     }
@@ -126,6 +122,9 @@ public class AdminProductService {
             parent = categoryRepository.findById(request.getParentId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.CATEGORY_NOT_FOUND));
             depth = (byte) (parent.getDepth() + 1);
+            if (depth > 3) {
+                throw new BusinessException(ErrorCode.CATEGORY_DEPTH_EXCEEDED);
+            }
         }
 
         Category category = Category.builder()

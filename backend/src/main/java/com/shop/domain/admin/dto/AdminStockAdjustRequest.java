@@ -14,6 +14,4 @@ public class AdminStockAdjustRequest {
 
     @NotNull(message = "조정 수량은 필수입니다.")
     private Integer delta;
-
-    private String reason;
 }

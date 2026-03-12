@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.id = :id")
     Optional<Product> findByIdWithLock(@Param("id") Long id);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Product p SET p.status = :status WHERE p.id IN :ids")
     void bulkUpdateStatus(@Param("ids") List<Long> ids, @Param("status") ProductStatus status);
 
@@ -35,6 +35,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         Pageable pageable
     );
 
-    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.images LEFT JOIN FETCH p.options WHERE p.id = :id")
-    Optional<Product> findByIdWithImagesAndOptions(@Param("id") Long id);
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.images WHERE p.id = :id")
+    Optional<Product> findByIdWithImages(@Param("id") Long id);
 }

@@ -207,7 +207,7 @@ class AdminProductServiceTest {
     @Test
     void 상품_상세_조회_성공() {
         // given
-        given(productRepository.findByIdWithImagesAndOptions(1L))
+        given(productRepository.findByIdWithImages(1L))
             .willReturn(Optional.of(testProduct));
 
         // when
@@ -221,7 +221,7 @@ class AdminProductServiceTest {
     @Test
     void 상품_상세_조회_없는_상품_실패() {
         // given
-        given(productRepository.findByIdWithImagesAndOptions(999L))
+        given(productRepository.findByIdWithImages(999L))
             .willReturn(Optional.empty());
 
         // when & then
@@ -233,7 +233,7 @@ class AdminProductServiceTest {
     @Test
     void 재고_증가_조정_성공() {
         // given
-        AdminStockAdjustRequest request = new AdminStockAdjustRequest(null, 50, "재고 추가");
+        AdminStockAdjustRequest request = new AdminStockAdjustRequest(null, 50);
 
         // when
         adminProductService.adjustStock(1L, request);
@@ -245,7 +245,7 @@ class AdminProductServiceTest {
     @Test
     void 재고_감소_조정_성공() {
         // given
-        AdminStockAdjustRequest request = new AdminStockAdjustRequest(null, -30, "재고 차감");
+        AdminStockAdjustRequest request = new AdminStockAdjustRequest(null, -30);
 
         // when
         adminProductService.adjustStock(1L, request);

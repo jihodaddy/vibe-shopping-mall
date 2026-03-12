@@ -2,6 +2,7 @@ package com.shop.domain.admin.controller;
 
 import com.shop.domain.admin.dto.*;
 import com.shop.domain.admin.service.AdminProductService;
+import com.shop.domain.product.entity.ProductStatus;
 import com.shop.global.dto.PresignedUrlRequest;
 import com.shop.global.dto.PresignedUrlResponse;
 import com.shop.global.response.ApiResponse;
@@ -38,7 +39,7 @@ public class AdminProductController {
             @PageableDefault(size = 20) Pageable pageable,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) ProductStatus status) {
         Page<AdminProductResponse> page = adminProductService.getProductList(pageable, keyword, categoryId, status);
         return ResponseEntity.ok(ApiResponse.ok(page));
     }
@@ -107,7 +108,7 @@ public class AdminProductController {
     @PutMapping("/api/admin/categories/{id}")
     public ResponseEntity<ApiResponse<Void>> updateCategory(
             @PathVariable Long id,
-            @RequestBody AdminCategoryUpdateRequest request) {
+            @Valid @RequestBody AdminCategoryUpdateRequest request) {
         adminProductService.updateCategory(id, request);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
