@@ -13,10 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +27,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +39,10 @@ public class AdminOrderService {
     private final OrderShippingRepository orderShippingRepository;
     private final InventoryService inventoryService;
     private final EmailService emailService;
+
+    @Autowired
+    @Lazy
+    private AdminOrderService self;
 
     @Transactional(readOnly = true)
     public Page<AdminOrderResponse> getOrderList(AdminOrderSearchCondition condition, Pageable pageable) {
@@ -89,35 +98,38 @@ public class AdminOrderService {
         emailService.sendShippingNotification(order);
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void bulkUpdateShipping(MultipartFile file) {
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+        try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
-            // skip header row (row 0), process from row 1
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
-
                 String orderNumber = getCellStringValue(row, 0);
                 String courier = getCellStringValue(row, 1);
                 String trackingNumber = getCellStringValue(row, 2);
-
                 if (orderNumber == null || orderNumber.isBlank()) continue;
-
-                orderRepository.findByOrderNumber(orderNumber).ifPresent(order -> {
-                    order.updateStatus(OrderStatus.SHIPPED);
-
-                    OrderShipping shipping = orderShippingRepository.findByOrderId(order.getId())
-                            .orElseGet(() -> OrderShipping.builder().orderId(order.getId()).build());
-
-                    shipping.update(courier, trackingNumber);
-                    orderShippingRepository.save(shipping);
-
-                    emailService.sendShippingNotification(order);
-                });
+                self.processBulkShippingRow(orderNumber, courier, trackingNumber);
             }
         } catch (IOException e) {
-            throw new BusinessException(ErrorCode.S3_UPLOAD_FAILED);
+            throw new BusinessException(ErrorCode.EXCEL_PARSE_FAILED);
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processBulkShippingRow(String orderNumber, String courier, String trackingNumber) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
+
+        Long orderId = order.getId();
+        order.updateStatus(OrderStatus.SHIPPED);
+
+        OrderShipping shipping = orderShippingRepository.findByOrderId(orderId)
+                .orElseGet(() -> OrderShipping.builder().orderId(orderId).build());
+        shipping.update(courier, trackingNumber);
+        orderShippingRepository.save(shipping);
+
+        emailService.sendShippingNotification(order);
     }
 
     public void processRefund(Long orderId, AdminRefundRequest request) {
@@ -125,7 +137,7 @@ public class AdminOrderService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.ORDER_NOT_FOUND));
 
         if (order.getStatus() != OrderStatus.REFUND_REQUESTED) {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+            throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
         }
 
         List<Long> itemIds = request.getOrderItemIds();
@@ -136,6 +148,19 @@ public class AdminOrderService {
                 inventoryService.increase(item.getProductId(), item.getOptionId(),
                         item.getQty(), InventoryType.CANCEL, order.getId());
             }
+        }
+
+        Set<Long> foundIds = order.getItems().stream()
+                .filter(item -> itemIds.contains(item.getId()))
+                .map(OrderItem::getId)
+                .collect(Collectors.toSet());
+
+        Set<Long> notFoundIds = itemIds.stream()
+                .filter(id -> !foundIds.contains(id))
+                .collect(Collectors.toSet());
+
+        if (!notFoundIds.isEmpty()) {
+            throw new BusinessException(ErrorCode.ORDER_ITEM_NOT_FOUND);
         }
 
         boolean allReturned = order.getItems().stream()

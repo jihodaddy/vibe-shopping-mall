@@ -28,6 +28,8 @@ public enum ErrorCode {
 
     // 주문/결제
     ORDER_NOT_FOUND("주문을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ORDER_ITEM_NOT_FOUND("주문 상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_ORDER_STATUS("주문 상태가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     DUPLICATE_PAYMENT("이미 결제가 진행 중입니다.", HttpStatus.CONFLICT),
     PAYMENT_AMOUNT_MISMATCH("결제 금액이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     PAYMENT_FAILED("결제 처리에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -41,7 +43,8 @@ public enum ErrorCode {
     CART_ITEM_NOT_FOUND("장바구니 아이템을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     // 파일 업로드
-    S3_UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    S3_UPLOAD_FAILED("파일 업로드에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    EXCEL_PARSE_FAILED("엑셀 파일 처리에 실패했습니다.", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final HttpStatus httpStatus;

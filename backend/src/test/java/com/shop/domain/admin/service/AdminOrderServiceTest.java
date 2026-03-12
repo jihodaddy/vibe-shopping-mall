@@ -52,6 +52,12 @@ class AdminOrderServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        // self-injection is not handled by @InjectMocks; wire it manually so that
+        // bulkUpdateShipping can delegate to processBulkShippingRow via the proxy field
+        Field selfField = AdminOrderService.class.getDeclaredField("self");
+        selfField.setAccessible(true);
+        selfField.set(adminOrderService, adminOrderService);
+
         testOrder = Order.builder()
                 .memberId(1L)
                 .orderNumber("ORD-20260313-001")

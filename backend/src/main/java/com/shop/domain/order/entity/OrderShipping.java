@@ -38,7 +38,9 @@ public class OrderShipping {
     public void update(String courier, String trackingNumber) {
         this.courier = courier;
         this.trackingNumber = trackingNumber;
-        this.shippedAt = LocalDateTime.now();
+        if (this.shippedAt == null) {
+            this.shippedAt = LocalDateTime.now();
+        }
     }
 
     public void markDelivered() {
