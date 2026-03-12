@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
-import { ProductsPage, OrdersPage, MembersPage } from './pages/placeholder/PlaceholderPage';
+import { ProductsPage, OrdersPage, MembersPage, CouponsPage, CsPage, StatsPage } from './pages/placeholder/PlaceholderPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,6 +31,9 @@ export default function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/members" element={<MembersPage />} />
+            <Route path="/coupons" element={<CouponsPage />} />
+            <Route path="/cs" element={<CsPage />} />
+            <Route path="/stats" element={<StatsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

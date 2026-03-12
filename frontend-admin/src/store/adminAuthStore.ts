@@ -22,6 +22,7 @@ export const useAdminAuthStore = create<AdminAuthState>()(
     }),
     {
       name: 'admin-auth-storage',
+      partialize: (state) => ({ admin: state.admin }),
     }
   )
 );

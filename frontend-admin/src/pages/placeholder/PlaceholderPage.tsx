@@ -25,3 +25,15 @@ export function OrdersPage() {
 export function MembersPage() {
   return <PlaceholderPage title="회원관리" />;
 }
+
+export function CouponsPage() {
+  return <PlaceholderPage title="쿠폰/배너 관리" />;
+}
+
+export function CsPage() {
+  return <PlaceholderPage title="CS 문의 관리" />;
+}
+
+export function StatsPage() {
+  return <PlaceholderPage title="통계 대시보드" />;
+}
