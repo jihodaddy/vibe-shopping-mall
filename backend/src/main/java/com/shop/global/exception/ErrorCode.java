@@ -38,6 +38,13 @@ public enum ErrorCode {
     COUPON_NOT_FOUND("쿠폰을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     COUPON_EXPIRED("만료된 쿠폰입니다.", HttpStatus.BAD_REQUEST),
     COUPON_ALREADY_USED("이미 사용된 쿠폰입니다.", HttpStatus.CONFLICT),
+    COUPON_EXHAUSTED("쿠폰 수량이 소진되었습니다.", HttpStatus.CONFLICT),
+    COUPON_INACTIVE("비활성화된 쿠폰입니다.", HttpStatus.BAD_REQUEST),
+    COUPON_ALREADY_ISSUED("이미 발급된 쿠폰입니다.", HttpStatus.CONFLICT),
+    DUPLICATE_COUPON_CODE("이미 존재하는 쿠폰 코드입니다.", HttpStatus.CONFLICT),
+
+    // 배너
+    BANNER_NOT_FOUND("배너를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     // 장바구니
     CART_ITEM_NOT_FOUND("장바구니 아이템을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

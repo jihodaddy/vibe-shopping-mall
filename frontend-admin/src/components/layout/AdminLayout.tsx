@@ -6,6 +6,7 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
   TagsOutlined,
+  PictureOutlined,
   CustomerServiceOutlined,
   BarChartOutlined,
   LogoutOutlined,
@@ -24,7 +25,8 @@ const menuItems = [
   { key: '/products', icon: <ShoppingOutlined />, label: '상품관리' },
   { key: '/orders', icon: <ShoppingCartOutlined />, label: '주문관리' },
   { key: '/members', icon: <UserOutlined />, label: '회원관리' },
-  { key: '/coupons', icon: <TagsOutlined />, label: '쿠폰/배너' },
+  { key: '/coupons', icon: <TagsOutlined />, label: '쿠폰관리' },
+  { key: '/banners', icon: <PictureOutlined />, label: '배너관리' },
   { key: '/cs', icon: <CustomerServiceOutlined />, label: 'CS관리' },
   { key: '/stats', icon: <BarChartOutlined />, label: '통계' },
 ];
@@ -34,7 +36,8 @@ const breadcrumbNameMap: Record<string, string> = {
   '/products': '상품관리',
   '/orders': '주문관리',
   '/members': '회원관리',
-  '/coupons': '쿠폰/배너',
+  '/coupons': '쿠폰관리',
+  '/banners': '배너관리',
   '/cs': 'CS관리',
   '/stats': '통계',
 };
