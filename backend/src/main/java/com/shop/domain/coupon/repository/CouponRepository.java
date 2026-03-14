@@ -1,7 +1,7 @@
-package com.shop.domain.admin.repository;
+package com.shop.domain.coupon.repository;
 
-import com.shop.domain.admin.entity.Coupon;
-import com.shop.domain.admin.entity.CouponType;
+import com.shop.domain.coupon.entity.Coupon;
+import com.shop.domain.coupon.entity.CouponType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

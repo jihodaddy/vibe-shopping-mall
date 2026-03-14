@@ -1,8 +1,8 @@
 package com.shop.domain.admin.dto;
 
-import com.shop.domain.admin.entity.Coupon;
-import com.shop.domain.admin.entity.CouponTarget;
-import com.shop.domain.admin.entity.CouponType;
+import com.shop.domain.coupon.entity.Coupon;
+import com.shop.domain.coupon.entity.CouponTarget;
+import com.shop.domain.coupon.entity.CouponType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,8 +52,22 @@ public class AdminCouponResponse {
     }
 
     public static AdminCouponResponse from(Coupon coupon, long issuedCount) {
-        AdminCouponResponse response = from(coupon);
-        response.issuedCount = issuedCount;
-        return response;
+        return AdminCouponResponse.builder()
+            .id(coupon.getId())
+            .code(coupon.getCode())
+            .name(coupon.getName())
+            .type(coupon.getType())
+            .value(coupon.getValue())
+            .minOrderPrice(coupon.getMinOrderPrice())
+            .maxDiscountPrice(coupon.getMaxDiscountPrice())
+            .target(coupon.getTarget())
+            .targetId(coupon.getTargetId())
+            .startAt(coupon.getStartAt())
+            .endAt(coupon.getEndAt())
+            .totalQty(coupon.getTotalQty())
+            .usedQty(coupon.getUsedQty())
+            .active(coupon.isActive())
+            .issuedCount(issuedCount)
+            .build();
     }
 }

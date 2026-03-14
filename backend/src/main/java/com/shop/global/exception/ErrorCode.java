@@ -42,9 +42,13 @@ public enum ErrorCode {
     COUPON_INACTIVE("비활성화된 쿠폰입니다.", HttpStatus.BAD_REQUEST),
     COUPON_ALREADY_ISSUED("이미 발급된 쿠폰입니다.", HttpStatus.CONFLICT),
     DUPLICATE_COUPON_CODE("이미 존재하는 쿠폰 코드입니다.", HttpStatus.CONFLICT),
+    COUPON_TYPE_CHANGE_NOT_ALLOWED("발급된 쿠폰의 타입은 변경할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     // 배너
     BANNER_NOT_FOUND("배너를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    // 공통
+    INVALID_DATE_RANGE("종료일은 시작일 이후여야 합니다.", HttpStatus.BAD_REQUEST),
 
     // 장바구니
     CART_ITEM_NOT_FOUND("장바구니 아이템을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

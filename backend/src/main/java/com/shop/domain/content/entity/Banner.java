@@ -1,5 +1,6 @@
-package com.shop.domain.admin.entity;
+package com.shop.domain.content.entity;
 
+import com.shop.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "banners")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Banner {
+public class Banner extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

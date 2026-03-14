@@ -1,4 +1,4 @@
-package com.shop.domain.admin.entity;
+package com.shop.domain.content.entity;
 
 public enum BannerPosition {
     MAIN_TOP,

@@ -1,9 +1,9 @@
 package com.shop.domain.admin.service;
 
 import com.shop.domain.admin.dto.*;
-import com.shop.domain.admin.entity.Banner;
-import com.shop.domain.admin.entity.BannerPosition;
-import com.shop.domain.admin.repository.BannerRepository;
+import com.shop.domain.content.entity.Banner;
+import com.shop.domain.content.entity.BannerPosition;
+import com.shop.domain.content.repository.BannerRepository;
 import com.shop.global.exception.BusinessException;
 import com.shop.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class AdminContentService {
     private final BannerRepository bannerRepository;
 
     public Long createBanner(AdminBannerCreateRequest request) {
+        validateBannerDateRange(request.getStartAt(), request.getEndAt());
+
         Banner banner = Banner.builder()
             .title(request.getTitle())
             .imageUrl(request.getImageUrl())
@@ -37,6 +43,8 @@ public class AdminContentService {
     }
 
     public void updateBanner(Long id, AdminBannerUpdateRequest request) {
+        validateBannerDateRange(request.getStartAt(), request.getEndAt());
+
         Banner banner = bannerRepository.findById(id)
             .orElseThrow(() -> new BusinessException(ErrorCode.BANNER_NOT_FOUND));
 
@@ -73,10 +81,21 @@ public class AdminContentService {
 
     public void updateBannerSort(AdminBannerSortRequest request) {
         List<Long> bannerIds = request.getBannerIds();
+        Map<Long, Banner> bannerMap = bannerRepository.findAllById(bannerIds).stream()
+            .collect(Collectors.toMap(Banner::getId, Function.identity()));
+
         for (int i = 0; i < bannerIds.size(); i++) {
-            Banner banner = bannerRepository.findById(bannerIds.get(i))
-                .orElseThrow(() -> new BusinessException(ErrorCode.BANNER_NOT_FOUND));
+            Banner banner = bannerMap.get(bannerIds.get(i));
+            if (banner == null) {
+                throw new BusinessException(ErrorCode.BANNER_NOT_FOUND);
+            }
             banner.updateSortOrder(i);
+        }
+    }
+
+    private void validateBannerDateRange(LocalDateTime startAt, LocalDateTime endAt) {
+        if (startAt != null && endAt != null && !endAt.isAfter(startAt)) {
+            throw new BusinessException(ErrorCode.INVALID_DATE_RANGE);
         }
     }
 }

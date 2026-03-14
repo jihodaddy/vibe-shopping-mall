@@ -1,7 +1,7 @@
-package com.shop.domain.admin.repository;
+package com.shop.domain.content.repository;
 
-import com.shop.domain.admin.entity.Banner;
-import com.shop.domain.admin.entity.BannerPosition;
+import com.shop.domain.content.entity.Banner;
+import com.shop.domain.content.entity.BannerPosition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

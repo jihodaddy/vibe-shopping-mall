@@ -1,9 +1,9 @@
 package com.shop.domain.admin.service;
 
 import com.shop.domain.admin.dto.*;
-import com.shop.domain.admin.entity.*;
-import com.shop.domain.admin.repository.CouponRepository;
-import com.shop.domain.admin.repository.MemberCouponRepository;
+import com.shop.domain.coupon.entity.*;
+import com.shop.domain.coupon.repository.CouponRepository;
+import com.shop.domain.coupon.repository.MemberCouponRepository;
 import com.shop.domain.member.entity.Member;
 import com.shop.domain.member.entity.MemberStatus;
 import com.shop.domain.member.repository.MemberRepository;
@@ -15,7 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,8 @@ public class AdminCouponService {
     private final MemberRepository memberRepository;
 
     public Long createCoupon(AdminCouponCreateRequest request) {
+        validateDateRange(request.getStartAt(), request.getEndAt());
+
         if (couponRepository.existsByCode(request.getCode())) {
             throw new BusinessException(ErrorCode.DUPLICATE_COUPON_CODE);
         }
@@ -50,8 +55,14 @@ public class AdminCouponService {
     }
 
     public void updateCoupon(Long id, AdminCouponUpdateRequest request) {
+        validateDateRange(request.getStartAt(), request.getEndAt());
+
         Coupon coupon = couponRepository.findById(id)
             .orElseThrow(() -> new BusinessException(ErrorCode.COUPON_NOT_FOUND));
+
+        if (coupon.getUsedQty() > 0 && coupon.getType() != request.getType()) {
+            throw new BusinessException(ErrorCode.COUPON_TYPE_CHANGE_NOT_ALLOWED);
+        }
 
         coupon.update(
             request.getName(),
@@ -76,11 +87,18 @@ public class AdminCouponService {
     @Transactional(readOnly = true)
     public Page<AdminCouponResponse> getCouponList(Pageable pageable, String keyword,
                                                     CouponType type, Boolean isActive) {
-        return couponRepository.findByCondition(keyword, type, isActive, pageable)
-            .map(coupon -> {
-                long issuedCount = memberCouponRepository.countByCouponId(coupon.getId());
-                return AdminCouponResponse.from(coupon, issuedCount);
-            });
+        Page<Coupon> couponPage = couponRepository.findByCondition(keyword, type, isActive, pageable);
+
+        List<Long> couponIds = couponPage.getContent().stream()
+            .map(Coupon::getId)
+            .toList();
+
+        Map<Long, Long> issuedCountMap = getIssuedCountMap(couponIds);
+
+        return couponPage.map(coupon -> {
+            long issuedCount = issuedCountMap.getOrDefault(coupon.getId(), 0L);
+            return AdminCouponResponse.from(coupon, issuedCount);
+        });
     }
 
     @Transactional(readOnly = true)
@@ -104,14 +122,12 @@ public class AdminCouponService {
 
         List<Member> members;
         if (request.getMemberIds() == null || request.getMemberIds().isEmpty()) {
-            // Bulk issue to all active members
-            members = memberRepository.findAll().stream()
-                .filter(m -> m.getStatus() == MemberStatus.ACTIVE)
-                .toList();
+            members = memberRepository.findByStatus(MemberStatus.ACTIVE);
         } else {
             members = memberRepository.findAllById(request.getMemberIds());
         }
 
+        List<MemberCoupon> toSave = new ArrayList<>();
         int issuedCount = 0;
         for (Member member : members) {
             if (coupon.isExhausted()) {
@@ -125,10 +141,33 @@ public class AdminCouponService {
                 .member(member)
                 .coupon(coupon)
                 .build();
-            memberCouponRepository.save(memberCoupon);
+            toSave.add(memberCoupon);
+            coupon.incrementUsedQty();
             issuedCount++;
         }
 
+        if (!toSave.isEmpty()) {
+            memberCouponRepository.saveAll(toSave);
+        }
+
         return issuedCount;
+    }
+
+    private Map<Long, Long> getIssuedCountMap(List<Long> couponIds) {
+        if (couponIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<Long, Long> map = new HashMap<>();
+        List<Object[]> results = memberCouponRepository.countByCouponIdIn(couponIds);
+        for (Object[] row : results) {
+            map.put((Long) row[0], (Long) row[1]);
+        }
+        return map;
+    }
+
+    private void validateDateRange(java.time.LocalDateTime startAt, java.time.LocalDateTime endAt) {
+        if (startAt != null && endAt != null && !endAt.isAfter(startAt)) {
+            throw new BusinessException(ErrorCode.INVALID_DATE_RANGE);
+        }
     }
 }

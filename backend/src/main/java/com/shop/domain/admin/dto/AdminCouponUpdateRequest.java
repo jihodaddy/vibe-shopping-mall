@@ -1,7 +1,7 @@
 package com.shop.domain.admin.dto;
 
-import com.shop.domain.admin.entity.CouponTarget;
-import com.shop.domain.admin.entity.CouponType;
+import com.shop.domain.coupon.entity.CouponTarget;
+import com.shop.domain.coupon.entity.CouponType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;

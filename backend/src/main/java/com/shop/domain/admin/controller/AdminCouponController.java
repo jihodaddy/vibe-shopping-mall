@@ -1,7 +1,7 @@
 package com.shop.domain.admin.controller;
 
 import com.shop.domain.admin.dto.*;
-import com.shop.domain.admin.entity.CouponType;
+import com.shop.domain.coupon.entity.CouponType;
 import com.shop.domain.admin.service.AdminCouponService;
 import com.shop.global.response.ApiResponse;
 import jakarta.validation.Valid;

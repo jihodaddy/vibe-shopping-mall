@@ -1,4 +1,4 @@
-package com.shop.domain.admin.entity;
+package com.shop.domain.coupon.entity;
 
 public enum MemberCouponStatus {
     UNUSED,

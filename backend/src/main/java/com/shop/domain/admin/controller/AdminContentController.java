@@ -1,7 +1,7 @@
 package com.shop.domain.admin.controller;
 
 import com.shop.domain.admin.dto.*;
-import com.shop.domain.admin.entity.BannerPosition;
+import com.shop.domain.content.entity.BannerPosition;
 import com.shop.domain.admin.service.AdminContentService;
 import com.shop.global.dto.PresignedUrlRequest;
 import com.shop.global.dto.PresignedUrlResponse;

@@ -1,9 +1,9 @@
 package com.shop.domain.admin.service;
 
 import com.shop.domain.admin.dto.*;
-import com.shop.domain.admin.entity.Banner;
-import com.shop.domain.admin.entity.BannerPosition;
-import com.shop.domain.admin.repository.BannerRepository;
+import com.shop.domain.content.entity.Banner;
+import com.shop.domain.content.entity.BannerPosition;
+import com.shop.domain.content.repository.BannerRepository;
 import com.shop.global.exception.BusinessException;
 import com.shop.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -175,10 +175,13 @@ class AdminContentServiceTest {
         Banner banner2 = Banner.builder()
             .title("배너2").imageUrl("url2").position(BannerPosition.MAIN_TOP).sortOrder(1).build();
 
+        // ID를 리플렉션으로 설정
+        setField(banner1, "id", 1L);
+        setField(banner2, "id", 2L);
+
         AdminBannerSortRequest request = new AdminBannerSortRequest(List.of(2L, 1L));
 
-        given(bannerRepository.findById(2L)).willReturn(Optional.of(banner2));
-        given(bannerRepository.findById(1L)).willReturn(Optional.of(banner1));
+        given(bannerRepository.findAllById(List.of(2L, 1L))).willReturn(List.of(banner1, banner2));
 
         // when
         adminContentService.updateBannerSort(request);
@@ -186,5 +189,15 @@ class AdminContentServiceTest {
         // then
         assertThat(banner2.getSortOrder()).isEqualTo(0);
         assertThat(banner1.getSortOrder()).isEqualTo(1);
+    }
+
+    private void setField(Object target, String fieldName, Object value) {
+        try {
+            java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

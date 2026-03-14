@@ -1,16 +1,18 @@
-package com.shop.domain.admin.entity;
+package com.shop.domain.coupon.entity;
 
 import com.shop.domain.member.entity.Member;
+import com.shop.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "member_coupons")
+@Table(name = "member_coupons",
+    uniqueConstraints = @UniqueConstraint(name = "uk_member_coupon", columnNames = {"member_id", "coupon_id"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberCoupon {
+public class MemberCoupon extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,6 @@
 package com.shop.domain.admin.dto;
 
-import com.shop.domain.admin.entity.BannerPosition;
+import com.shop.domain.content.entity.BannerPosition;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
