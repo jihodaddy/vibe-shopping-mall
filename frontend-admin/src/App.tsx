@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
-import { CsPage, StatsPage } from './pages/placeholder/PlaceholderPage';
+import { StatsPage } from './pages/placeholder/PlaceholderPage';
 import CouponListPage from './pages/coupon/CouponListPage';
 import BannerListPage from './pages/banner/BannerListPage';
 import MemberListPage from './pages/member/MemberListPage';
@@ -13,6 +13,9 @@ import OrderDetailPage from './pages/order/OrderDetailPage';
 import ProductListPage from './pages/product/ProductListPage';
 import ProductFormPage from './pages/product/ProductFormPage';
 import CategoryPage from './pages/product/CategoryPage';
+import InquiryListPage from './pages/cs/InquiryListPage';
+import InquiryDetailPage from './pages/cs/InquiryDetailPage';
+import NoticeListPage from './pages/cs/NoticeListPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,7 +50,9 @@ export default function App() {
             <Route path="/members/:id" element={<MemberDetailPage />} />
             <Route path="/coupons" element={<CouponListPage />} />
             <Route path="/banners" element={<BannerListPage />} />
-            <Route path="/cs" element={<CsPage />} />
+            <Route path="/cs/inquiries" element={<InquiryListPage />} />
+            <Route path="/cs/inquiries/:id" element={<InquiryDetailPage />} />
+            <Route path="/cs/notices" element={<NoticeListPage />} />
             <Route path="/stats" element={<StatsPage />} />
           </Route>
         </Routes>

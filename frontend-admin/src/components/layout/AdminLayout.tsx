@@ -12,6 +12,8 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  QuestionCircleOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAdminAuthStore } from '../../store/adminAuthStore';
@@ -27,7 +29,15 @@ const menuItems = [
   { key: '/members', icon: <UserOutlined />, label: '회원관리' },
   { key: '/coupons', icon: <TagsOutlined />, label: '쿠폰관리' },
   { key: '/banners', icon: <PictureOutlined />, label: '배너관리' },
-  { key: '/cs', icon: <CustomerServiceOutlined />, label: 'CS관리' },
+  {
+    key: '/cs',
+    icon: <CustomerServiceOutlined />,
+    label: 'CS관리',
+    children: [
+      { key: '/cs/inquiries', icon: <QuestionCircleOutlined />, label: '문의관리' },
+      { key: '/cs/notices', icon: <NotificationOutlined />, label: '공지관리' },
+    ],
+  },
   { key: '/stats', icon: <BarChartOutlined />, label: '통계' },
 ];
 
@@ -38,7 +48,8 @@ const breadcrumbNameMap: Record<string, string> = {
   '/members': '회원관리',
   '/coupons': '쿠폰관리',
   '/banners': '배너관리',
-  '/cs': 'CS관리',
+  '/cs/inquiries': '문의관리',
+  '/cs/notices': '공지관리',
   '/stats': '통계',
 };
 
@@ -69,7 +80,10 @@ export default function AdminLayout() {
   };
 
   const currentPath = location.pathname;
-  const breadcrumbLabel = breadcrumbNameMap[currentPath] ?? currentPath;
+  const selectedKey = Object.keys(breadcrumbNameMap)
+    .filter((key) => currentPath.startsWith(key))
+    .sort((a, b) => b.length - a.length)[0] ?? currentPath;
+  const breadcrumbLabel = breadcrumbNameMap[selectedKey] ?? currentPath;
 
   const userMenuItems = [
     {
@@ -107,7 +121,8 @@ export default function AdminLayout() {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[currentPath]}
+          selectedKeys={[selectedKey]}
+          defaultOpenKeys={['/cs']}
           items={menuItems}
           onClick={handleMenuClick}
           style={{ marginTop: 8 }}

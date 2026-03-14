@@ -47,6 +47,13 @@ public enum ErrorCode {
     // 배너
     BANNER_NOT_FOUND("배너를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
+    // 문의
+    INQUIRY_NOT_FOUND("문의를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INQUIRY_ALREADY_CLOSED("이미 종료된 문의입니다.", HttpStatus.BAD_REQUEST),
+
+    // 공지사항
+    NOTICE_NOT_FOUND("공지사항을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
     // 공통
     INVALID_DATE_RANGE("종료일은 시작일 이후여야 합니다.", HttpStatus.BAD_REQUEST),
 
