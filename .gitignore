@@ -18,6 +18,15 @@ build/
 # Spring Boot
 *.log
 *.log.*
+bin/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+hs_err_pid*
+
+# QueryDSL generated sources
+**/generated-sources/
 
 # Node
 node_modules/
