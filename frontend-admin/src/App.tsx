@@ -3,7 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
-import { StatsPage } from './pages/placeholder/PlaceholderPage';
+import SalesStatsPage from './pages/stats/SalesStatsPage';
+import SearchStatsPage from './pages/stats/SearchStatsPage';
 import CouponListPage from './pages/coupon/CouponListPage';
 import BannerListPage from './pages/banner/BannerListPage';
 import MemberListPage from './pages/member/MemberListPage';
@@ -53,7 +54,8 @@ export default function App() {
             <Route path="/cs/inquiries" element={<InquiryListPage />} />
             <Route path="/cs/inquiries/:id" element={<InquiryDetailPage />} />
             <Route path="/cs/notices" element={<NoticeListPage />} />
-            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/stats/sales" element={<SalesStatsPage />} />
+            <Route path="/stats/search" element={<SearchStatsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

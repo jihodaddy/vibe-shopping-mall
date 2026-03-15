@@ -38,7 +38,15 @@ const menuItems = [
       { key: '/cs/notices', icon: <NotificationOutlined />, label: '공지관리' },
     ],
   },
-  { key: '/stats', icon: <BarChartOutlined />, label: '통계' },
+  {
+    key: '/stats',
+    icon: <BarChartOutlined />,
+    label: '통계',
+    children: [
+      { key: '/stats/sales', label: '매출통계' },
+      { key: '/stats/search', label: '검색어분석' },
+    ],
+  },
 ];
 
 const breadcrumbNameMap: Record<string, string> = {
@@ -50,7 +58,8 @@ const breadcrumbNameMap: Record<string, string> = {
   '/banners': '배너관리',
   '/cs/inquiries': '문의관리',
   '/cs/notices': '공지관리',
-  '/stats': '통계',
+  '/stats/sales': '매출통계',
+  '/stats/search': '검색어분석',
 };
 
 export default function AdminLayout() {
@@ -122,7 +131,7 @@ export default function AdminLayout() {
           theme="dark"
           mode="inline"
           selectedKeys={[selectedKey]}
-          defaultOpenKeys={['/cs']}
+          defaultOpenKeys={['/cs', '/stats']}
           items={menuItems}
           onClick={handleMenuClick}
           style={{ marginTop: 8 }}
