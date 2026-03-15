@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.global.exception.BusinessException;
+import com.shop.global.exception.ErrorCode;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,6 +27,7 @@ public class AdminStatsService {
     private final SearchLogRepository searchLogRepository;
 
     public SalesStatsResponse getSalesStats(LocalDate from, LocalDate to, StatsPeriod period) {
+        validateDateRange(from, to);
         List<DailyStat> dailyStats = dailyStatRepository.findByStatDateBetweenOrderByStatDateAsc(from, to);
 
         List<SalesStatsResponse.SalesStatsItem> items = switch (period) {
@@ -36,6 +40,7 @@ public class AdminStatsService {
     }
 
     public StatsSummaryResponse getStatsSummary(LocalDate from, LocalDate to) {
+        validateDateRange(from, to);
         List<DailyStat> dailyStats = dailyStatRepository.findByStatDateBetweenOrderByStatDateAsc(from, to);
 
         long totalSales = dailyStats.stream().mapToLong(DailyStat::getSalesAmount).sum();
@@ -54,6 +59,7 @@ public class AdminStatsService {
     }
 
     public SearchKeywordResponse getTopSearchKeywords(LocalDate from, LocalDate to, int limit) {
+        validateDateRange(from, to);
         LocalDateTime fromDateTime = from.atStartOfDay();
         LocalDateTime toDateTime = to.atTime(LocalTime.MAX);
 
@@ -114,6 +120,12 @@ public class AdminStatsService {
         return grouped.entrySet().stream()
                 .map(entry -> aggregateGroup(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    private void validateDateRange(LocalDate from, LocalDate to) {
+        if (from.isAfter(to)) {
+            throw new BusinessException(ErrorCode.INVALID_DATE_RANGE);
+        }
     }
 
     private SalesStatsResponse.SalesStatsItem aggregateGroup(String label, List<DailyStat> stats) {

@@ -38,7 +38,8 @@ public class AdminStatsController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(defaultValue = "20") int limit) {
-        SearchKeywordResponse response = adminStatsService.getTopSearchKeywords(from, to, limit);
+        int cappedLimit = Math.min(limit, 100);
+        SearchKeywordResponse response = adminStatsService.getTopSearchKeywords(from, to, cappedLimit);
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 }

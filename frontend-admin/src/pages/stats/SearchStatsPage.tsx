@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, DatePicker, Table, Typography, Space, Spin, Tag } from 'antd';
+import { Card, DatePicker, Table, Typography, Space, Spin, Tag, Alert } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import {
@@ -24,7 +24,7 @@ export default function SearchStatsPage() {
     dayjs().format('YYYY-MM-DD'),
   ]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['searchKeywords', dateRange[0], dateRange[1]],
     queryFn: () =>
       adminStatsApi.getSearchKeywords(dateRange[0], dateRange[1], 20).then((r) => r.data.data),
@@ -75,6 +75,15 @@ export default function SearchStatsPage() {
           />
         </Space>
       </Card>
+
+      {isError && (
+        <Alert
+          type="error"
+          message="데이터를 불러오는데 실패했습니다."
+          style={{ marginBottom: 24 }}
+          showIcon
+        />
+      )}
 
       {isLoading ? (
         <div style={{ textAlign: 'center', padding: 48 }}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {
   Card,
   Col,
@@ -12,6 +12,7 @@ import {
   Typography,
   Space,
   Spin,
+  Alert,
 } from 'antd';
 import {
   DollarOutlined,
@@ -47,14 +48,16 @@ export default function SalesStatsPage() {
   ]);
   const [period, setPeriod] = useState<StatsPeriod>('DAILY');
 
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  const { data: statsData, isLoading: statsLoading, isError: statsError } = useQuery({
     queryKey: ['salesStats', dateRange[0], dateRange[1], period],
     queryFn: () => adminStatsApi.getSalesStats(dateRange[0], dateRange[1], period).then((r) => r.data.data),
+    placeholderData: keepPreviousData,
   });
 
-  const { data: summaryData, isLoading: summaryLoading } = useQuery({
+  const { data: summaryData, isLoading: summaryLoading, isError: summaryError } = useQuery({
     queryKey: ['statsSummary', dateRange[0], dateRange[1]],
     queryFn: () => adminStatsApi.getSummary(dateRange[0], dateRange[1]).then((r) => r.data.data),
+    placeholderData: keepPreviousData,
   });
 
   const handleDateChange = (_: unknown, dateStrings: [string, string]) => {
@@ -109,6 +112,7 @@ export default function SalesStatsPage() {
   ];
 
   const isLoading = statsLoading || summaryLoading;
+  const isError = statsError || summaryError;
 
   return (
     <div>
@@ -134,6 +138,16 @@ export default function SalesStatsPage() {
           </Button>
         </Space>
       </Card>
+
+      {/* Error State */}
+      {isError && (
+        <Alert
+          type="error"
+          message="데이터를 불러오는데 실패했습니다."
+          style={{ marginBottom: 24 }}
+          showIcon
+        />
+      )}
 
       {/* Summary Cards */}
       {isLoading ? (

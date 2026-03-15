@@ -93,7 +93,13 @@ class AdminStatsServiceTest {
         SalesStatsResponse response = adminStatsService.getSalesStats(from, to, StatsPeriod.WEEKLY);
 
         // then
-        assertThat(response.getItems()).hasSizeGreaterThanOrEqualTo(2);
+        assertThat(response.getItems()).hasSize(2);
+        assertThat(response.getItems().get(0).getLabel()).matches("\\d{4}-W\\d{2}");
+        assertThat(response.getItems().get(0).getSalesAmount()).isEqualTo(220000L);
+        assertThat(response.getItems().get(0).getOrderCount()).isEqualTo(22);
+        assertThat(response.getItems().get(1).getSalesAmount()).isEqualTo(550000L);
+        assertThat(response.getItems().get(1).getOrderCount()).isEqualTo(38);
+        assertThat(response.getItems().get(1).getNewMemberCount()).isEqualTo(7);
     }
 
     @Test
