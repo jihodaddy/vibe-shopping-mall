@@ -42,11 +42,6 @@ public class Inquiry extends BaseTimeEntity {
     @Column(nullable = false)
     private InquiryStatus status = InquiryStatus.PENDING;
 
-    @Column(columnDefinition = "TEXT")
-    private String answer;
-
-    private java.time.LocalDateTime answeredAt;
-
     @Column(nullable = false)
     private boolean isSecret = false;
 

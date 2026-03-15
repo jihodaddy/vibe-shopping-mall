@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
 
-    @Query("SELECT i FROM Inquiry i JOIN FETCH i.member WHERE " +
+    @Query("SELECT i FROM Inquiry i WHERE " +
            "(:status IS NULL OR i.status = :status) AND " +
            "(:type IS NULL OR i.type = :type) AND " +
            "(:keyword IS NULL OR i.title LIKE CONCAT('%', :keyword, '%') OR i.content LIKE CONCAT('%', :keyword, '%'))")

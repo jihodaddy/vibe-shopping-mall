@@ -49,6 +49,7 @@ public class AdminNoticeService {
             .map(AdminNoticeResponse::from);
     }
 
+    @Transactional
     public AdminNoticeResponse getNoticeDetail(Long id) {
         Notice notice = noticeRepository.findById(id)
             .orElseThrow(() -> new BusinessException(ErrorCode.NOTICE_NOT_FOUND));

@@ -50,8 +50,8 @@ public class AdminNoticeController {
     }
 
     @DeleteMapping("/api/admin/cs/notices/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteNotice(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteNotice(@PathVariable Long id) {
         adminNoticeService.deleteNotice(id);
-        return ResponseEntity.ok(ApiResponse.ok(null));
+        return ResponseEntity.noContent().build();
     }
 }
